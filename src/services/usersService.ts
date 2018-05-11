@@ -1,57 +1,48 @@
 import "reflect-metadata";
-import { injectable } from "inversify";
+import {inject, injectable} from "inversify";
+import TYPES from "../constans/types";
 
-export interface IUser {
-  email: string;
+export interface IEntity {
   name: string;
+}
+@injectable()
+export class UserEntity implements IEntity{
+  public name: string;
+  constructor(pname: string){this.name=pname;}
+}
+@injectable()
+export class ContactEntity implements IEntity{
+  public name: string;
+  constructor(pname: string){this.name=pname;}
 }
 
 @injectable()
-export class UserService {
-  private userStorage: IUser[] = [
-    {
-      email: "lorem@ipsum.com",
-      name: "Lorem"
-    },
-    {
-      email: "doloe@sit.com",
-      name: "Dolor"
-    }
-  ];
+export class BaseService<T extends IEntity> {
+  constructor(@inject(typeof (T)) private Repo:IRepo<T>) {} //TYPES.Repo
+  public getData(): T {
+    return this.Repo.getData();
+}
+}
 
-  public getUsers(): IUser[] {
-    return this.userStorage;
+export interface IRepo<T extends IEntity> {
+  getData(): T ;
+}
+
+@injectable()
+export abstract class BaseRepo<T extends IEntity> implements IRepo<T>{
+  public abstract getData(): T ;
+}
+@injectable()
+export class UserRepo extends BaseRepo<UserEntity>{
+  //constructor(nameInstance:string) {super(nameInstance);}
+  public getData(): UserEntity {
+    return new UserEntity("name user UserEntity");
   }
-
-  public getUser(id: string): IUser {
-    const result = this.userStorage.filter(user => user.name === id);
-    return result[0];
-  }
-
-  public newUser(user: IUser): IUser {
-    this.userStorage.push(user);
-    return user;
-  }
-
-  public updateUser(id: string, user: IUser): IUser {
-    this.userStorage.map((entry, index) => {
-      if (entry.name === id) {
-        this.userStorage[index] = user;
-      }
-    });
-
-    return user;
-  }
-
-  public deleteUser(id: string): string {
-    const updatedUser: IUser[] = [];
-    this.userStorage.map(user => {
-      if (user.name !== id) {
-        updatedUser.push(user);
-      }
-    });
-
-    this.userStorage = updatedUser;
-    return id;
+}
+@injectable()
+export class ContactRepo extends BaseRepo<ContactEntity>{
+  //constructor(nameInstance:string) {super(nameInstance);}
+  public getData(): ContactEntity {
+    return new ContactEntity("name user ContactEntity");
   }
 }

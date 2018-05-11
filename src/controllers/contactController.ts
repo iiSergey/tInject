@@ -4,14 +4,14 @@ import {
 } from "inversify-express-utils";
 import { inject } from "inversify";
 import TYPES from "../constans/types";
-import { UserEntity, BaseService} from "../services/usersService";
+import {BaseService, ContactEntity} from "../services/usersService";
 
-@controller("/user")
+@controller("/contact")
 export class UserController {
-  constructor(@inject(TYPES.BaseService) private userService: BaseService<UserEntity>) {}
+  constructor(@inject(TYPES.BaseService) private userService: BaseService<ContactEntity>) {}
 
   @httpGet("/")
-  public getData(): UserEntity {
+  public getData(): ContactEntity {
     return this.userService.getData();
   }
 }
